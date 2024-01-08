@@ -19,8 +19,21 @@ class Shop(models.Model):
         return f"{self.name}"
 
 
+class Cart(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.book.title} - {self.user.username}"
+
+    class Meta:
+        unique_together = ["book", "user"]
+
+
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="orders")
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -30,7 +43,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
+    quantity = models.IntegerField()
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
 
     def __str__(self):
